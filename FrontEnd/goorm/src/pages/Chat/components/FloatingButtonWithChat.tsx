@@ -120,19 +120,20 @@ const FloatingButtonWithChat: React.FC = () => {
    //입장 확인 후 채팅방 입장 함수
    const confirmEnterChatRoom = () => {
       if (selectedChatRoom) {
+         callJoinChatRoom(selectedChatRoom);
          setCurrentChatRoomName(selectedChatRoom.chatRoomName);
          setCurrentChatRoomId(selectedChatRoom.chatRoomId);
          setInChatRoom(true);
          setTimeout(sendJoinMessage, 100);
 
          console.log("선택된 채팅방", selectedChatRoom);
-         callJoinChatRoom(selectedChatRoom);
       }
       closeModal();
    };
 
    //채팅방 참여정보 전송 함수 (모달창에서 확인클릭 시 동작)
    const callJoinChatRoom = async (chatRoom: any) => {
+      console.log("callJoinChatRoom: ",chatRoom.chatRoomId)
       try {
          await joinChatRoom(chatRoom.chatRoomId);
       } catch (error) {
@@ -249,7 +250,7 @@ const FloatingButtonWithChat: React.FC = () => {
          console.log("채팅 히스토리: ", messages); //채팅 히스토리 목록 출력
 
          //웹소켓 연결 설정
-         const socket = new SockJS("http://localhost:8080/api/websocket", {
+         const socket = new SockJS("http://final-project-app-env.eba-xdjqmujd.ap-northeast-2.elasticbeanstalk.com/api/websocket", {
             withCredentials: true,
          });
          // console.log("apiRequestUrl 출력: ",config.apiRequestUrl);

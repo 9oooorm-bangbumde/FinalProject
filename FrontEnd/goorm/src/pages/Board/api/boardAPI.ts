@@ -51,11 +51,11 @@ export const uploadImages = async (formData: FormData): Promise<string[]> => {
 };
 
 // 게시글 추가
-export const addPost = async (postData: { boardTitle: string; boardContent: string; boardType: string; boardCategory: string; imageUrls: string[] }): Promise<any> => {
+export const addPost = async (formData: FormData): Promise<any> => {
   try {
-    const response = await axiosInstance.post('/board/save', postData, {
+    const response = await axiosInstance.post('/board/save', formData, {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;

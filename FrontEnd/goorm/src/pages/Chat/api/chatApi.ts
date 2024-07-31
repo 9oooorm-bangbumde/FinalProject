@@ -70,3 +70,13 @@ export const createChatRoom = async (
       throw error;
    }
 };
+
+//현재 유저정보 조회
+export const getUserInfo = async () => {
+   try {
+      const response = await axiosInstance.get(`/member/get/info`);
+      return response.data;
+   } catch (error) {
+      throw error;
+   }
+};

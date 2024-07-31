@@ -7,10 +7,13 @@ import {
    getPublicChatRoom,
    joinChatRoom,
    createChatRoom,
+   getUserInfo
 } from "../api/chatApi";
 import { Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import Modal from "react-modal";
+import { useNavigate } from "react-router-dom";
+
 
 Modal.setAppElement("#root");
 
@@ -29,6 +32,9 @@ const FloatingButtonWithChat: React.FC = () => {
    const [selectedChatRoom, setSelectedChatRoom] = useState<any>(null); //채팅방 입장 전 입장여부 확인하기 위한 변수
    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
    const [newChatRoomName, setNewChatRoomName] = useState<string>("");
+   const navigate = useNavigate(); // useNavigate 훅 추가
+   const [currentUser, setCurrentUser] = useState<any>(null);
+
 
    const config = {
       apiRequestUrl: process.env.REACT_APP_API_REQUEST_URL,
@@ -86,7 +92,7 @@ const FloatingButtonWithChat: React.FC = () => {
    const sendJoinMessage = () => {
       const message = {
          chatType: "SYSTEM",
-         sender: "구름이",
+         sender: currentUser.username,
          message: "님이 입장하셨습니다.",
       };
       clientRef.current.send(
@@ -99,7 +105,7 @@ const FloatingButtonWithChat: React.FC = () => {
    const sendLeaveMessage = () => {
       const message = {
          chatType: "SYSTEM",
-         sender: "구름이",
+         sender: currentUser.username,
          message: "님이 퇴장하셨습니다.",
       };
       clientRef.current.send(
@@ -172,6 +178,21 @@ const FloatingButtonWithChat: React.FC = () => {
       const formattedMinutes = minutes.toString().padStart(2, "0"); // 시간이 1자리수면 앞에 0을 추가 ex/ 01시 , 02시
       return `${ampm} ${formattedHours}:${formattedMinutes}`;
    };
+
+   //현재 로그인한 사용자 정보 조회
+   const callgetUserInfo = async () => {
+      try{
+         const data = await getUserInfo();
+         setCurrentUser(data)
+         // if (!data){
+         //    throw new Error("조회된 유저정보가 없습니다.")
+         // }
+      }catch (error) {
+         navigate("/login")
+         alert("채팅기능 이용을 위해서는 로그인이 필요합니다.")
+         console.log("유저정보 불러오기 오류")
+      }
+   }
 
    //채팅방 입장, 메시지 입력 시 스크롤 제일 하단으로 이동하는 userEffect()
    useEffect(() => {
@@ -250,7 +271,7 @@ const FloatingButtonWithChat: React.FC = () => {
          console.log("채팅 히스토리: ", messages); //채팅 히스토리 목록 출력
 
          //웹소켓 연결 설정
-         const socket = new SockJS("http://final-project-app-env.eba-xdjqmujd.ap-northeast-2.elasticbeanstalk.com/api/websocket", {
+         const socket = new SockJS("http://localhost:8080/api/websocket", {
             withCredentials: true,
          });
          // console.log("apiRequestUrl 출력: ",config.apiRequestUrl);
@@ -385,11 +406,11 @@ const FloatingButtonWithChat: React.FC = () => {
             messagebox.push(
                <div
                   className={`chat-message ${
-                     message.sender === "구름이" ? "right" : "left"
+                     message.sender === currentUser.username ? "right" : "left"
                   }`}
                   key={message.id}
                >
-                  {message.sender === "구름이" && (
+                  {message.sender === currentUser.username && (
                      <div className="message-info">
                         <span className="unread-count">1</span>
                         <span className="message-time">
@@ -398,11 +419,11 @@ const FloatingButtonWithChat: React.FC = () => {
                      </div>
                   )}
 
-                  {message.sender === "구름이" && (
+                  {message.sender === currentUser.username && (
                      <div className="message-content">{message.message}</div>
                   )}
 
-                  {message.sender !== "구름이" && (
+                  {message.sender !== currentUser.username && (
                      <div className="others-message">
                         <div className="message-username">
                            <span className="sendername">{message.sender}</span>
@@ -411,7 +432,7 @@ const FloatingButtonWithChat: React.FC = () => {
                      </div>
                   )}
 
-                  {message.sender !== "구름이" && (
+                  {message.sender !== currentUser.username && (
                      <div className="message-info">
                         <span className="unread-count">0</span>
                         <span className="message-time">
@@ -509,7 +530,7 @@ const FloatingButtonWithChat: React.FC = () => {
 
    return (
       <div>
-         <button className="floating-button" onClick={toggleChat}>
+         <button className="floating-button" onClick= {() =>{toggleChat(); callgetUserInfo()}}>
             채팅
          </button>
          {isChatOpen && (

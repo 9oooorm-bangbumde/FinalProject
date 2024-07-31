@@ -1,5 +1,5 @@
 import axiosInstance from '../../../api/axiosInstance';
-import { Comment } from '../types';
+import { Comment } from '../types';
 import axios from 'axios';
 
 // 게시글 목록 조회

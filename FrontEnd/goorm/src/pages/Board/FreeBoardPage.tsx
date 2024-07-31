@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import FreePostList from './Post/FreePostList';
 import Pagination from './components/Pagination';
 import Searchbar from './components/SearchBar';
-import { BoardDetails } from './types';
+import { BoardDetails } from './types';
 import { fetchPosts } from './api/boardAPI';
 import Tabs from './components/Tabs';
 

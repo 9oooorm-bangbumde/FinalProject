@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import styles from './CommentSection.module.scss';
 import { fetchComments, addComment, deleteComment, updateComment } from '../api/boardAPI';
-import { Comment } from '../types';
+import { Comment } from '../types';
 
 
 interface CommentSectionProps {

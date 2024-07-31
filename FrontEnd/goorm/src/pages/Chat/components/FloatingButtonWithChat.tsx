@@ -573,7 +573,7 @@ const FloatingButtonWithChat: React.FC = () => {
          >
             <h2>알림</h2>
             <div className="modal-content">
-               <p>채팅방에 입장하시겠습니까?</p>
+               <p>{selectedChatRoom?.chatRoomName}에 입장하시겠습니까?</p>
                <div className="modal-buttons">
                   <button
                      className="confirm-button"

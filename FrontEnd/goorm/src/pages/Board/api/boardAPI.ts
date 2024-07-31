@@ -50,13 +50,10 @@ export const uploadImages = async (formData: FormData): Promise<string[]> => {
   }
 };
 
-// 게시글 추가
-export const addPost = async (formData: FormData): Promise<any> => {
+// 게시글 추가 (이미지 없이)
+export const addPost = async (postData: { boardTitle: string; boardContent: string; boardType: string; boardCategory: string; imageUrls?: string[] }): Promise<any> => {
   try {
-    const response = await axiosInstance.post('/board/save', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    const response = await axiosInstance.post('/board/save', postData, {
     });
     return response.data;
   } catch (error) {
@@ -68,42 +65,41 @@ export const addPost = async (formData: FormData): Promise<any> => {
   }
 };
 
-// 게시글 추가 및 유효성 검사
-export const addPostWithValidation = async (
-  title: string,
-  content: string,
-  boardType: string,
-  boardCategory: string,
-  imageUrls: FileList | null
-): Promise<void> => {
-  // 필수 입력 필드 확인
-  if (!title.trim() || !content.trim() || !boardType.trim() || !boardCategory.trim()) {
-    throw new Error('모든 필수 입력 필드를 입력해주세요.');
-  }
 
-  const formData = new FormData();
-  formData.append('boardTitle', title);
-  formData.append('boardContent', content);
-  formData.append('boardType', boardType);
-  formData.append('boardCategory', boardCategory);
+// // 게시글 추가 및 유효성 검사
+// export const addPostWithValidation = async (
+//   title: string,
+//   content: string,
+//   boardType: string,
+//   boardCategory: string,
+//   imageUrls: FileList | null
+// ): Promise<void> => {
+//   // 필수 입력 필드 확인
+//   if (!title.trim() || !content.trim() || !boardType.trim() || !boardCategory.trim()) {
+//     throw new Error('모든 필수 입력 필드를 입력해주세요.');
+//   }
 
-  // 이미지가 있을 경우 추가
-  if (imageUrls) {
-    Array.from(imageUrls).forEach(file => {
-      formData.append('images', file); // 'images' 필드 이름 사용
-    });
-  }
+//   const formData = new FormData();
+//   formData.append('boardTitle', title);
+//   formData.append('boardContent', content);
+//   formData.append('boardType', boardType);
+//   formData.append('boardCategory', boardCategory);
 
-  await addPost(formData);
-};
+//   // 이미지가 있을 경우 추가
+//   if (imageUrls) {
+//     Array.from(imageUrls).forEach(file => {
+//       formData.append('images', file); // 'images' 필드 이름 사용
+//     });
+//   }
+
+//   await addPost(formData);
+// };
 
 // 게시글 수정
 export const updatePost = async (formData: FormData): Promise<any> => {
   try {
     const response = await axiosInstance.post('/board/update', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+   
     });
     return response.data;
   } catch (error) {

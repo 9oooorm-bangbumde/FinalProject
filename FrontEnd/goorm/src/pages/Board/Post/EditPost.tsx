@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addPostWithValidation } from '../api/boardAPI'; 
+import { addPost, uploadImages } from '../api/boardAPI'; 
 import styles from './EditPost.module.scss';
 
 const EditPost: React.FC = () => {
@@ -34,24 +34,48 @@ const EditPost: React.FC = () => {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // 필수 입력 필드 확인
+    if (!title.trim() || !content.trim() || !boardType.trim() || !boardCategory.trim()) {
+      alert('모든 필수 입력 필드를 입력해주세요.');
+      return;
+    }
+
     try {
-      await addPostWithValidation(title, content, boardType, boardCategory, imageUrls);
+      let uploadedImageUrls: string[] = [];
+
+      // 이미지가 있을 경우 업로드
+      if (imageUrls) {
+        const imageFormData = new FormData();
+        Array.from(imageUrls).forEach(file => {
+          imageFormData.append('image', file); // 'image' 필드 이름 사용
+        });
+
+        const uploadResponse = await uploadImages(imageFormData);
+        uploadedImageUrls = uploadResponse;
+      }
+
+      // 게시글 데이터 생성
+      const postData = {
+        boardTitle: title,
+        boardContent: content,
+        boardType: boardType,
+        boardCategory: boardCategory,
+        imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
+      };
+
+      await addPost(postData);
       alert('게시글이 성공적으로 작성되었습니다.');
       navigate(`/Board/${boardType.toLowerCase()}`);
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert('게시글 작성 중 오류가 발생했습니다.');
-        console.error('게시글 작성 중 오류가 발생했습니다:', error);
-      }
+      alert('게시글 작성 중 오류가 발생했습니다.');
+      console.error('게시글 작성 중 오류가 발생했습니다:', error);
     }
   };
 
   return (
     <div className={styles.postContainer}>
       <h2>게시글 작성</h2>
-      <form onSubmit={handleSave} encType="multipart/form-data">
+      <form onSubmit={handleSave}>
         <select value={boardType} onChange={handleBoardTypeChange}>
           <option value="FREE">자유게시판</option>
           <option value="WORKOUT">운동게시판</option>

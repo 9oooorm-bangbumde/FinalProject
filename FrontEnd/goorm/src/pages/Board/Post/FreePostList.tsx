@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { BoardDetails, BoardProps } from '../types';
+import { BoardDetails, BoardProps } from '../types';
 import { fetchPosts } from '../api/boardAPI'; 
 
 const Table = styled.table`

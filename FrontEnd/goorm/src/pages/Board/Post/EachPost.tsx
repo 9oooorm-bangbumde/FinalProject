@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { BoardDetails } from '../types';
+import { BoardDetails } from '../types';
 import { fetchPostDetail, deletePost, toggleLike } from '../api/boardAPI';
 import styles from './EachPost.module.scss';
 import CommentSection from './CommentSection';

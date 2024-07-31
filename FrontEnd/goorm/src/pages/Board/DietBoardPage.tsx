@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Board from './Post/FreePostList';
 import Pagination from './components/Pagination';
 import Searchbar from './components/SearchBar';
-import { BoardDetails } from './types';
+import { BoardDetails } from './types';
 import { fetchPosts } from './api/boardAPI'; // API 함수 임포트
 import Tabs from './components/Tabs';
 

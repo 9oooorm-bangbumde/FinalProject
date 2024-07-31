@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addPost, uploadImages } from '../api/boardAPI'; 
+import { addPostWithValidation } from '../api/boardAPI'; 
 import styles from './EditPost.module.scss';
 
 const EditPost: React.FC = () => {
@@ -34,32 +34,17 @@ const EditPost: React.FC = () => {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 필수 입력 필드 확인
-    if (!title.trim() || !content.trim() || !boardType.trim() || !boardCategory.trim()) {
-      alert('모든 필수 입력 필드를 입력해주세요.');
-      return;
-    }
-
     try {
-      const formData = new FormData();
-      formData.append('boardTitle', title);
-      formData.append('boardContent', content);
-      formData.append('boardType', boardType);
-      formData.append('boardCategory', boardCategory);
-
-      // 이미지가 있을 경우 추가
-      if (imageUrls) {
-        Array.from(imageUrls).forEach(file => {
-          formData.append('images', file); // 'images' 필드 이름 사용
-        });
-      }
-
-      await addPost(formData);
+      await addPostWithValidation(title, content, boardType, boardCategory, imageUrls);
       alert('게시글이 성공적으로 작성되었습니다.');
       navigate(`/Board/${boardType.toLowerCase()}`);
     } catch (error) {
-      alert('게시글 작성 중 오류가 발생했습니다.');
-      console.error('게시글 작성 중 오류가 발생했습니다:', error);
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('게시글 작성 중 오류가 발생했습니다.');
+        console.error('게시글 작성 중 오류가 발생했습니다:', error);
+      }
     }
   };
 

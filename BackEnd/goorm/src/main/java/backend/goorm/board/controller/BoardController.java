@@ -9,8 +9,11 @@ import backend.goorm.board.model.dto.response.BoardListResponse;
 import backend.goorm.board.model.enums.BoardCategory;
 import backend.goorm.board.model.enums.BoardSortType;
 import backend.goorm.board.model.enums.BoardType;
+import backend.goorm.board.repository.BoardRepository;
 import backend.goorm.board.service.BoardService;
+import backend.goorm.member.model.entity.Member;
 import backend.goorm.member.oauth.PrincipalDetails;
+import backend.goorm.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/board")
@@ -26,19 +30,22 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final MemberRepository memberRepository;
 
     /**
      * 게시글 등록
      * @param saveRequest
-     * @param authentication
      * @return
      */
     @PostMapping("/save")
-    public ResponseEntity saveBoard(@RequestBody BoardSaveRequest saveRequest, Authentication authentication){
+    public ResponseEntity saveBoard(@RequestBody BoardSaveRequest saveRequest){
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        boardService.saveBoard(saveRequest, principalDetails.member());
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
+
+        boardService.saveBoard(saveRequest,testMember);
 
         return ResponseEntity.ok("게시글 등록 완료");
     }
@@ -64,11 +71,14 @@ public class BoardController {
     }
 
     @GetMapping("/detail/{number}")
-    public ResponseEntity getBoardDetail(@PathVariable Long number, Authentication authentication){
+    public ResponseEntity getBoardDetail(@PathVariable Long number){
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        BoardDetailResponse detailResponse = boardService.getBoardDetail(number, principalDetails.member());
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
+
+        BoardDetailResponse detailResponse = boardService.getBoardDetail(number, testMember);
 
         return ResponseEntity.ok(detailResponse);
     }

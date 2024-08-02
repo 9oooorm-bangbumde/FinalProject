@@ -1,6 +1,7 @@
 package backend.goorm.payments.service;
 
 import backend.goorm.payments.model.dto.request.KakaoPayRequest;
+import backend.goorm.payments.model.dto.response.KakaoAproveResponse;
 import backend.goorm.payments.model.dto.response.KakaoReadyResponse;
 import backend.goorm.payments.util.SessionUtils;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,26 @@ public class PaymentsServiceImpl implements PaymentsService {
         log.info("결제준비 응답객체: " + responseEntity.getBody());
 
         return responseEntity.getBody();
+    }
+
+    @Override
+    public KakaoAproveResponse kakaoPayApprove(String tid, String pgToken) {
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("cid", cid);              // 가맹점 코드(테스트용)
+        parameters.put("tid", tid);                       // 결제 고유번호
+        parameters.put("partner_order_id", order_id); // 주문번호
+        parameters.put("partner_user_id", "bangbumde");    // 회원 아이디
+        parameters.put("pg_token", pgToken);              // 결제승인 요청을 인증하는 토큰
+
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
+
+        RestTemplate template = new RestTemplate();
+        String url = "https://open-api.kakaopay.com/online/v1/payment/approve";
+        KakaoAproveResponse approveResponse = template.postForObject(url, requestEntity, KakaoAproveResponse.class);
+        log.info("결제승인 응답객체: " + approveResponse);
+
+        return approveResponse;
     }
 
     private HttpHeaders getHeaders() {

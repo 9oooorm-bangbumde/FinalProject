@@ -4,12 +4,16 @@ import backend.goorm.board.model.dto.request.CommentSaveRequest;
 import backend.goorm.board.model.dto.request.CommentUpdateRequest;
 import backend.goorm.board.model.dto.response.CommentListResponse;
 import backend.goorm.board.service.CommentService;
+import backend.goorm.member.model.entity.Member;
 import backend.goorm.member.oauth.PrincipalDetails;
+import backend.goorm.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RequestMapping("api/comment")
 @RestController
@@ -18,19 +22,21 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private final MemberRepository memberRepository;
 
     /**
      * 댓글 저장
      * @param commentSaveRequest
-     * @param authentication
      * @return
      */
     @PostMapping("/save")
-    public ResponseEntity saveComment(@RequestBody CommentSaveRequest commentSaveRequest, Authentication authentication){
+    public ResponseEntity saveComment(@RequestBody CommentSaveRequest commentSaveRequest){
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        commentService.saveComment(commentSaveRequest, principalDetails.member());
+        commentService.saveComment(commentSaveRequest, testMember);
 
 
         return ResponseEntity.ok("저장 완료");
@@ -50,22 +56,28 @@ public class CommentController {
     }
 
     @PostMapping("/delete/{commentId}")
-    public ResponseEntity deleteComment(@PathVariable Long commentId,  Authentication authentication){
+    public ResponseEntity deleteComment(@PathVariable Long commentId){
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        commentService.deleteComment(commentId, principalDetails.member());
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
+
+        commentService.deleteComment(commentId, testMember);
 
         return ResponseEntity.ok("삭제가 완료되었습니다");
     }
 
 
     @PostMapping("/update")
-    public ResponseEntity updateComment(@RequestBody CommentUpdateRequest updateCommentRequest, Authentication authentication){
+    public ResponseEntity updateComment(@RequestBody CommentUpdateRequest updateCommentRequest){
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
 
-        commentService.updateComment(updateCommentRequest, principalDetails.member());
+
+        commentService.updateComment(updateCommentRequest, testMember);
 
         return ResponseEntity.ok("수정이 완료되었습니다");
     }

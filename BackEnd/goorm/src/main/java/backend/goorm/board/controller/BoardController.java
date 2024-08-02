@@ -84,30 +84,40 @@ public class BoardController {
     }
 
     @PostMapping("/delete/{boardId}")
-    public ResponseEntity deleteBoard(@PathVariable Long boardId, Authentication authentication){
+    public ResponseEntity deleteBoard(@PathVariable Long boardId){
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        boardService.deleteBoard(boardId, principalDetails.member());
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
+
+        boardService.deleteBoard(boardId, testMember);
 
         return ResponseEntity.ok("삭제 완료");
     }
 
     @PostMapping("/update")
-    public ResponseEntity updateBoard(@RequestBody BoardUpdateRequest updateRequest, Authentication authentication){
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+    public ResponseEntity updateBoard(@RequestBody BoardUpdateRequest updateRequest){
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        boardService.updateBoard(updateRequest, principalDetails.member());
+
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
+
+        boardService.updateBoard(updateRequest, testMember);
 
         return ResponseEntity.ok("수정 완료");
     }
 
     @PostMapping("/toggle/like/{boardId}")
-    public ResponseEntity toggleLike(@PathVariable Long boardId, Authentication authentication){
+    public ResponseEntity toggleLike(@PathVariable Long boardId){
 
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Member testMember = findMember.get();
 
-        String message = boardService.toggleLike(boardId, principalDetails.member());
+
+        String message = boardService.toggleLike(boardId, testMember);
 
         return ResponseEntity.ok(message);
     }

@@ -70,15 +70,17 @@ public class BoardController {
         return ResponseEntity.ok(boardList);
     }
 
-    @GetMapping("/detail/{number}")
-    public ResponseEntity getBoardDetail(@PathVariable Long number){
+
+    @GetMapping("/detail/{boardId}")
+    public ResponseEntity getBoardDetail(@PathVariable Long boardId, Authentication authentication){
+
 
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
         Optional<Member> findMember = memberRepository.findByMemberId(6L);
         Member testMember = findMember.get();
 
-        BoardDetailResponse detailResponse = boardService.getBoardDetail(number, testMember);
+        BoardDetailResponse detailResponse = boardService.getBoardDetail(boardId, testMember);
 
         return ResponseEntity.ok(detailResponse);
     }

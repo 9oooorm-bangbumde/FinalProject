@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addPost, uploadImages } from '../api/boardAPI'; 
-import styles from './EditPost.module.scss';
+import { addPost, uploadImages } from '../api/boardAPI';
+import Category from '../components/Category';
+import TextEditor from '../../../components/TextEditor/TextEditor';
+import styles from './CreatePost.module.scss';
 
-const EditPost: React.FC = () => {
+const CreatePost: React.FC = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [boardType, setBoardType] = useState<string>('FREE');
-  const [boardCategory, setBoardCategory] = useState<string>('NONE');
+  const [boardCategory, setBoardCategory] = useState<string>('WORKOUT');
   const [imageUrls, setImageUrls] = useState<FileList | null>(null);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   };
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
+  const handleContentChange = (data: string) => {
+    setContent(data);
   };
 
   const handleBoardTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -34,7 +36,6 @@ const EditPost: React.FC = () => {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 필수 입력 필드 확인
     if (!title.trim() || !content.trim() || !boardType.trim() || !boardCategory.trim()) {
       alert('모든 필수 입력 필드를 입력해주세요.');
       return;
@@ -43,18 +44,16 @@ const EditPost: React.FC = () => {
     try {
       let uploadedImageUrls: string[] = [];
 
-      // 이미지가 있을 경우 업로드
       if (imageUrls) {
         const imageFormData = new FormData();
         Array.from(imageUrls).forEach(file => {
-          imageFormData.append('image', file); // 'image' 필드 이름 사용
+          imageFormData.append('image', file);
         });
 
         const uploadResponse = await uploadImages(imageFormData);
         uploadedImageUrls = uploadResponse;
       }
 
-      // 게시글 데이터 생성
       const postData = {
         boardTitle: title,
         boardContent: content,
@@ -76,21 +75,12 @@ const EditPost: React.FC = () => {
     <div className={styles.postContainer}>
       <h2>게시글 작성</h2>
       <form onSubmit={handleSave}>
-        <select value={boardType} onChange={handleBoardTypeChange}>
-          <option value="FREE">자유게시판</option>
-          <option value="WORKOUT">운동게시판</option>
-          <option value="DIET">식단게시판</option>
-        </select>
-        <select value={boardCategory} onChange={handleBoardCategoryChange}>
-          <option value="NONE">카테고리 없음</option>
-          <option value="WORKOUT">운동</option>
-          <option value="FOOD">맛집</option>
-          <option value="AD">광고</option>
-          <option value="CONCERN">상담</option>
-          <option value="HOBBY">취미</option>
-          <option value="NEIGHBOR">동네</option>
-          <option value="ETC">기타</option>
-        </select>
+        <Category 
+          boardType={boardType} 
+          boardCategory={boardCategory} 
+          handleBoardTypeChange={handleBoardTypeChange} 
+          handleBoardCategoryChange={handleBoardCategoryChange}
+        />
         <input 
           type='text' 
           placeholder='제목' 
@@ -98,12 +88,7 @@ const EditPost: React.FC = () => {
           onChange={handleTitleChange} 
           required
         />
-        <textarea 
-          placeholder='내용' 
-          value={content} 
-          onChange={handleContentChange}
-          required
-        ></textarea>
+        <TextEditor defaultValue={content} onChange={handleContentChange} />
         <input 
           type="file" 
           multiple 
@@ -118,4 +103,4 @@ const EditPost: React.FC = () => {
   );
 };
 
-export default EditPost;
+export default CreatePost;

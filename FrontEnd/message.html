@@ -1,0 +1,96 @@
+```
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login</title>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            async function handleLogin(event) {
+                event.preventDefault();
+
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+
+                const formData = new FormData();
+                formData.append("loginId", username);
+                formData.append("loginPw", password);
+
+                try {
+                    const response = await axios.post(
+                        "http://localhost:8080/api/auth/login",
+                        formData,
+                        {
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                            },
+                            withCredentials: true,
+                        }
+                    );
+
+                    if (response.status === 200) {
+                        console.log("로그인 성공:", response.data);
+                        alert("로그인 성공");
+                    }
+                } catch (error) {
+                    console.error("로그인 실패:", error.response.data);
+                    alert("로그인 실패: " + error.response.data);
+                }
+            }
+
+            async function handleLogout() {
+                try {
+                    const response = await axios.post(
+                        "http://localhost:8080/api/auth/logout",
+                        {},
+                        {
+                            withCredentials: true,
+                        }
+                    );
+
+                    if (response.status === 200) {
+                        console.log("로그아웃 성공");
+                        alert("로그아웃 성공");
+                    }
+                } catch (error) {
+                    console.error("로그아웃 실패:", error.response.data);
+                    alert("로그아웃 실패: " + error.response.data);
+                }
+            }
+
+            async function handleTestRequest() {
+                try {
+                    const response = await axios.get("http://localhost:8080/api/member/testOAuth", {
+                        withCredentials: true,
+                    });
+
+                    if (response.status === 200) {
+                        console.log("API 요청 성공:", response.data);
+                        alert("API 요청 성공: " + response.data);
+                    }
+                } catch (error) {
+                    console.error("API 요청 실패:", error.response.data);
+                    alert("API 요청 실패: " + error.response.data);
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required />
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required />
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <button onclick="handleLogout()">Logout</button>
+        <button onclick="handleTestRequest()">Test API</button>
+    </body>
+</html>
+
+```

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import FreePostList from './Post/FreePostList';
+import { useNavigate } from 'react-router-dom';
+import BoardList from './BoardList';
 import Pagination from './components/Pagination';
 import Searchbar from './components/SearchBar';
 import { BoardDetails } from './types';
@@ -14,69 +14,61 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin: 20px 0;
-  padding-right: 20px;
-`;
-
-const WriteButton = styled.button`
-  padding: 10px 20px;
-  font-size: 16px;
-  color: #fff;
-  background-color: #BAA085;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
 const FreeBoardPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>('FREE');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [postsPerPage] = useState<number>(10);
-  const [totalPosts, setTotalPosts] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);  
   const [currentPosts, setCurrentPosts] = useState<BoardDetails[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const navigate = useNavigate();
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: number) => {
+    console.log('Paginate:', pageNumber); 
+    setCurrentPage(pageNumber);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchPosts(selectedTab, currentPage, searchQuery);
-        
-        
+        console.log('Fetching posts with:', {
+          selectedTab,
+          currentPage,
+          searchQuery,
+        });
+        const data = await fetchPosts(selectedTab, currentPage - 1, searchQuery);
         setCurrentPosts(data.boardItems);
-        setTotalPosts(data.totalCnt);
+        setTotalPages(data.totalPages);  
+
+        console.log('Total Pages:', data.totalPages);
+        console.log('Total Posts:', data.totalCnt);
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
     };
 
+    console.log('Fetching posts:', selectedTab, currentPage, searchQuery);
     fetchData();
-  }, [selectedTab, currentPage, searchQuery, postsPerPage]);
+  }, [selectedTab, currentPage, searchQuery]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('Search submitted with query:', searchQuery);
     setCurrentPage(1);
   };
 
   return (
     <Container>
-      <ButtonContainer>
-        <WriteButton onClick={() => navigate('/Board/free/edit')}>작성하기</WriteButton>
-      </ButtonContainer>
       <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-      <FreePostList boardType={selectedTab} currentPage={currentPage} postsPerPage={postsPerPage} posts={currentPosts} />
-      <Pagination
-        totalPosts={totalPosts}
+      <BoardList
+        boardType={selectedTab}
+        currentPage={currentPage}
         postsPerPage={postsPerPage}
+        posts={currentPosts}
+        setPosts={setCurrentPosts}
+      />
+      <Pagination
+        totalPages={totalPages}  
         currentPage={currentPage}
         paginate={paginate}
       />

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Board from './Post/FreePostList';
-import Pagination from './components/Pagination';
-import Searchbar from './components/SearchBar';
-import { BoardDetails } from './types';
-import { fetchPosts } from './api/boardAPI'; // API 함수 임포트
-import Tabs from './components/Tabs';
+import BoardList from '../BoardList';
+import Pagination from '../components/Pagination';
+import Searchbar from '../components/SearchBar';
+import { BoardDetails } from '../types';
+import { fetchPosts } from '../api/boardAPI'; // API 함수 임포트
+import Tabs from '../components/Tabs';
 
 const Container = styled.div`
   padding: 0 20px;
@@ -17,7 +17,7 @@ const DietBoardPage: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>('DIET');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [postsPerPage] = useState<number>(10);
-  const [totalPosts, setTotalPosts] = useState<number>(0);
+  const [totalPages, setTotalPosts] = useState<number>(0);
   const [currentPosts, setCurrentPosts] = useState<BoardDetails[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchPerformed, setSearchPerformed] = useState<boolean>(false);
@@ -27,7 +27,7 @@ const DietBoardPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchPosts(selectedTab, currentPage - 1, );
+        const data = await fetchPosts(selectedTab, currentPage - 1, searchQuery);
         const formattedPosts = data.boardItems.map((post: any) => ({
           boardId: post.boardId,
           writer: post.writer,
@@ -65,10 +65,15 @@ const DietBoardPage: React.FC = () => {
   return (
     <Container>
       <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-      <Board boardType={selectedTab} currentPage={currentPage} postsPerPage={postsPerPage} posts={currentPosts} />
-      <Pagination
-        totalPosts={totalPosts}
+      <BoardList
+        boardType={selectedTab}
+        currentPage={currentPage}
         postsPerPage={postsPerPage}
+        posts={currentPosts}
+        setPosts={setCurrentPosts}
+      />
+      <Pagination
+        totalPages={totalPages}  
         currentPage={currentPage}
         paginate={paginate}
       />

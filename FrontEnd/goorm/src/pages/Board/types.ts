@@ -30,11 +30,11 @@ export interface BoardTabsProps {
 }
 
 export interface PaginationProps {
-    totalPosts: number;
-    postsPerPage: number;
+    totalPages: number;
     currentPage: number;
-    paginate: (pageNumber: number) => void;
+    paginate: (pageNumber: number) => any;
 }
+
 
 export interface PostItemProps {
     post: BoardDetails;
@@ -51,6 +51,7 @@ export interface BoardProps {
     currentPage: number;
     postsPerPage: number;
     posts: BoardDetails[];
+    setPosts: React.Dispatch<React.SetStateAction<BoardDetails[]>>; // setPosts 추가
 }
 
 export interface Comment {

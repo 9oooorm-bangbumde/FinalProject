@@ -1,23 +1,26 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent, useRef } from 'react';
+import React, { useState, useEffect, FormEvent, Dispatch, SetStateAction } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import styles from './CommentSection.module.scss';
 import { fetchComments, addComment, deleteComment, updateComment } from '../api/boardAPI';
 import { Comment } from '../types';
-
+import CommentTextEditor from './CommentTextEditor';
+import { DeleteCommentModal } from '../components/Modal';
 
 interface CommentSectionProps {
   postId: number;
+  setShowDeleteCommentModal: Dispatch<SetStateAction<boolean>>;
+  setModalMessage: Dispatch<SetStateAction<string>>;
+  setModalAction: Dispatch<() => void>;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ postId, setShowDeleteCommentModal, setModalMessage, setModalAction }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
   const [editCommentContent, setEditCommentContent] = useState<string>('');
-  const editInputRef = useRef<HTMLTextAreaElement>(null);
+  const [showDeleteCommentModal, setShowDeleteCommentModalState] = useState(false); // 새로운 상태 추가
 
   const loadComments = async () => {
     try {
@@ -31,13 +34,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   useEffect(() => {
     loadComments();
   }, [postId]);
-
-  useEffect(() => {
-    if (editInputRef.current) {
-      editInputRef.current.style.height = 'auto';
-      editInputRef.current.style.height = editInputRef.current.scrollHeight + 'px';
-    }
-  }, [editCommentContent]);
 
   const handleCommentSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -55,7 +51,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     try {
       await addComment(newCommentData);
       setNewComment('');
-      loadComments(); // 댓글 목록 다시 불러오기
+      loadComments();
     } catch (error) {
       console.error('댓글 작성 중 오류가 발생했습니다.', error);
     }
@@ -77,7 +73,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       await updateComment(updatedCommentData);
       setEditCommentId(null);
       setEditCommentContent('');
-      loadComments(); // 댓글 목록 다시 불러오기
+      loadComments();
     } catch (error) {
       console.error('댓글 수정 중 오류가 발생했습니다.', error);
     }
@@ -86,10 +82,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const confirmDeleteComment = async () => {
     if (commentToDelete !== null) {
       try {
+        console.log('Deleting comment with ID:', commentToDelete); // 디버깅 로그 추가
         await deleteComment(commentToDelete.toString());
         setComments(comments.filter(comment => comment.commentId !== commentToDelete));
         setCommentToDelete(null);
-        setIsModalOpen(false);
+        setShowDeleteCommentModalState(false); // 모달 닫기
       } catch (error) {
         console.error('댓글 삭제 중 오류가 발생했습니다.', error);
       }
@@ -98,12 +95,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 
   const openModal = (commentId: number) => {
     setCommentToDelete(commentId);
-    setIsModalOpen(true);
+    setModalMessage('댓글을 삭제하시겠습니까?');
+    setModalAction(() => confirmDeleteComment);
+    setShowDeleteCommentModalState(true); // 모달 열기
   };
 
   const closeModal = () => {
     setCommentToDelete(null);
-    setIsModalOpen(false);
+    setShowDeleteCommentModalState(false); // 모달 닫기
   };
 
   const startEditingComment = (commentId: number, commentContent: string) => {
@@ -118,9 +117,21 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 
   return (
     <div className={styles.commentSection}>
+      <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
+        <div className={styles.inputContainer}>
+          <div className={styles.commentInputWrapper}>
+            <CommentTextEditor
+              defaultValue={newComment}
+              onChange={setNewComment}
+            />
+          </div>
+          <button type="submit" className={styles.submitButton}>
+            작성하기
+          </button>
+        </div>
+      </form>
       <ul className={styles.commentList}>
         {comments.map(comment => (
-
           <li key={comment.commentId} className={styles.commentItem}>
             <div className={styles.commentHeader}>
               <div className={styles.userIcon}>
@@ -129,13 +140,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
               <span className={styles.commentAuthor}>{comment.writer}</span>
               {editCommentId === comment.commentId ? (
                 <form onSubmit={handleCommentUpdateSubmit} className={styles.editForm}>
-                  <textarea
-                    ref={editInputRef}
-                    value={editCommentContent}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setEditCommentContent(e.target.value)}
-                    className={styles.editInput}
-                  />
-                  <div className={styles.editFormButtons}>
+                  <div className={styles.commentInputWrapper}>
+                    <CommentTextEditor
+                      defaultValue={editCommentContent}
+                      onChange={setEditCommentContent}
+                    />
+                  </div>
+                  <div className={styles.buttonGroup}>
                     <button type="submit" className={`${styles.saveButton} ${styles.button}`}>저장</button>
                     <button type="button" onClick={cancelEditing} className={`${styles.cancelButton} ${styles.button}`}>취소</button>
                   </div>
@@ -143,8 +154,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
               ) : (
                 <>
                   <div className={styles.commentContentWrapper}>
-
-                    <span className={styles.commentContent}>{comment.commentContent}</span>
+                    <span className={styles.commentContent} dangerouslySetInnerHTML={{ __html: comment.commentContent }} />
                   </div>
                   <div className={styles.rightAligned}>
                     <span className={styles.commentDate}>{comment.commentRegDate}</span>
@@ -169,33 +179,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
           </li>
         ))}
       </ul>
-      <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
-        <div className={styles.inputContainer}>
-          <div className={styles.userIcon}>
-            <FontAwesomeIcon icon={faUser} />
-          </div>
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewComment(e.target.value)}
-            className={styles.commentInput}
-            placeholder="댓글을 입력하세요"
-          />
-          <button type="submit" className={styles.submitButton}>
-            댓글 작성
-          </button>
-        </div>
-      </form>
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <p>댓글을 삭제하시겠습니까?</p>
-            <div className={styles.modalButtons}>
-              <button onClick={confirmDeleteComment} className={`${styles.confirmButton} ${styles.button}`}>삭제</button>
-              <button onClick={closeModal} className={`${styles.cancelButton} ${styles.button}`}>취소</button>
-            </div>
-          </div>
-        </div>
+      {showDeleteCommentModal && commentToDelete !== null && (
+        <DeleteCommentModal
+          modalMessage='댓글을 삭제하시겠습니까?'
+          modalAction={confirmDeleteComment}
+          closeDeleteCommentModal={closeModal}
+        />
       )}
     </div>
   );

@@ -81,9 +81,12 @@ const Searchbar: React.FC<SearchbarProps> = ({ searchQuery, setSearchQuery, hand
   return (
     <SearchBarContainer onSubmit={handleSearch}>
       <input
-        type="search"
+        type="text"
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={(e) => {
+          console.log('Search input changed:', e.target.value);
+          setSearchQuery(e.target.value);
+        }}
         placeholder="검색어를 입력하세요"
       />
       <button type="submit"><FaSearch /></button>

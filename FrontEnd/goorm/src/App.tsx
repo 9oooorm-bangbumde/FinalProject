@@ -7,12 +7,12 @@ import Exercise from './pages/Exercise/Exercise';
 import Map from './pages/FindGym/Map/Map';
 import Login from './pages/Login/Login';
 import SignUp from './pages/SignUp/SignUp';
-import EachPost from './pages/Board/Post/EachPost';
 import FreeBoardPage from './pages/Board/FreeBoardPage';
-import ExerciseBoardPage from './pages/Board/ExerciseBoardPage';
-import DietBoardPage from './pages/Board/DietBoardPage';
-import EditPost from './pages/Board/Post/EditPost';
-
+import ExerciseBoardPage from './pages/Board/page/ExerciseBoardPage';
+import DietBoardPage from './pages/Board/page/DietBoardPage';
+import DetailPost from './pages/Board/Post/DetailPost';
+import UpdatePost from './pages/Board/Post/UpdatePost';
+import CreatePost from './pages/Board/Post/CreatePost'; 
 
 const Layout: React.FC = () => (
   <>
@@ -39,9 +39,9 @@ const App: React.FC = () => {
           <Route path="/Board/free" element={<FreeBoardPage />} />
           <Route path="/Board/exercise" element={<ExerciseBoardPage />} />
           <Route path="/Board/diet" element={<DietBoardPage />} />
-          <Route path="/Board/post/:id" element={<EachPost />} />
-          <Route path="/Board/:boardType/edit" element={<EditPost />} />
-          <Route path="/Board/:boardType/edit/:id" element={<EditPost />} /> 
+          <Route path="/Board/free/post/:id" element={<DetailPost />} />
+          <Route path="/Board/free/post/edit/:id" element={<UpdatePost />} />
+          <Route path="/Board/free/createpost" element={<CreatePost />} /> 
         </Route>
       </Routes>
     </BrowserRouter>

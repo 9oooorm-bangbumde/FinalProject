@@ -72,12 +72,12 @@ public class BoardController {
 
 
     @GetMapping("/detail/{boardId}")
-    public ResponseEntity getBoardDetail(@PathVariable Long boardId, Authentication authentication){
+    public ResponseEntity getBoardDetail(@PathVariable Long boardId){
 
 
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
 
         BoardDetailResponse detailResponse = boardService.getBoardDetail(boardId, testMember);
@@ -90,7 +90,7 @@ public class BoardController {
 
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
 
         boardService.deleteBoard(boardId, testMember);
@@ -103,7 +103,7 @@ public class BoardController {
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
 
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
 
         boardService.updateBoard(updateRequest, testMember);
@@ -115,7 +115,7 @@ public class BoardController {
     public ResponseEntity toggleLike(@PathVariable Long boardId){
 
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
 
 

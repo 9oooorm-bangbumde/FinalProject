@@ -32,7 +32,7 @@ public class CommentController {
     @PostMapping("/save")
     public ResponseEntity saveComment(@RequestBody CommentSaveRequest commentSaveRequest){
 
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
@@ -60,7 +60,7 @@ public class CommentController {
 
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
 
         commentService.deleteComment(commentId, testMember);
@@ -73,7 +73,7 @@ public class CommentController {
     public ResponseEntity updateComment(@RequestBody CommentUpdateRequest updateCommentRequest){
 
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
 
 

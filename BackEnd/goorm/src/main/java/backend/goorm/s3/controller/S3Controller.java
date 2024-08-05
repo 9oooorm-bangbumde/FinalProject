@@ -1,5 +1,6 @@
 package backend.goorm.s3.controller;
 
+import backend.goorm.s3.model.dto.response.ResponseCKUpload;
 import backend.goorm.s3.service.S3ImageService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,16 @@ public class S3Controller {
         return ResponseEntity.ok(profileImages);
     }
 
+    @PostMapping("/ck/upload")
+    public ResponseEntity ckImageUpload(@RequestPart(value = "upload", required = false)MultipartFile image) {
+        String profileImage = s3ImageService.upload(image);
 
+        ResponseCKUpload ckUpload = new ResponseCKUpload();
+        ckUpload.setUploaded(true);
+        ckUpload.setUrl(profileImage);
+
+        return ResponseEntity.ok(ckUpload);
+    }
 
     @GetMapping("/delete")
     public ResponseEntity<?> s3delete(@RequestParam String addr) {

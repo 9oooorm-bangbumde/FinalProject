@@ -182,17 +182,6 @@ public class BoardServiceImpl implements BoardService {
             throw new CustomException(CustomExceptionType.NO_AUTHORITY_TO_UPDATE);
         }
 
-        //List<String> findImageUrls = boardImageRepository.findImageUrlsByBoardId(updateRequest.getBoardId());
-
-//        for(String addr : findImageUrls){
-//
-//            s3ImageService.deleteImageFromS3(addr);
-//        }
-
-        //boardImageRepository.deleteByBoardId(updateRequest.getBoardId());
-
-        //saveImage(updateRequest.getUpdateImageUrls(), updateRequest.getBoardId());
-
         findBoard.get().updateBoard(updateRequest);
     }
 
@@ -241,17 +230,4 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
-    public void saveImage(List<String> imageUrls, Long boardId) {
-        if(imageUrls == null || imageUrls.isEmpty()) {
-            return;
-        }
-
-        for(String url : imageUrls){
-            BoardImages boardImage = BoardImages.builder()
-                    .boardId(boardId)
-                    .imageUrl(url)
-                    .build();
-            boardImageRepository.save(boardImage);
-        }
-    }
 }

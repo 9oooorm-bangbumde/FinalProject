@@ -42,7 +42,7 @@ public class BoardController {
 
         //PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
 
-        Optional<Member> findMember = memberRepository.findByMemberId(6L);
+        Optional<Member> findMember = memberRepository.findByMemberId(1L);
         Member testMember = findMember.get();
 
         boardService.saveBoard(saveRequest,testMember);

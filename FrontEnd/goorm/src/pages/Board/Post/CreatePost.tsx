@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addPost, uploadImages } from '../api/boardAPI';
+import { addPost } from '../api/boardAPI';
 import Category from '../components/Category';
 import TextEditor from '../../../components/TextEditor/TextEditor';
 import styles from './CreatePost.module.scss';
@@ -11,7 +11,6 @@ const CreatePost: React.FC = () => {
   const [content, setContent] = useState<string>('');
   const [boardType, setBoardType] = useState<string>('FREE');
   const [boardCategory, setBoardCategory] = useState<string>('WORKOUT');
-  const [imageUrls, setImageUrls] = useState<FileList | null>(null);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -29,10 +28,6 @@ const CreatePost: React.FC = () => {
     setBoardCategory(e.target.value);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setImageUrls(e.target.files);
-  };
-
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -42,24 +37,11 @@ const CreatePost: React.FC = () => {
     }
 
     try {
-      let uploadedImageUrls: string[] = [];
-
-      if (imageUrls) {
-        const imageFormData = new FormData();
-        Array.from(imageUrls).forEach(file => {
-          imageFormData.append('image', file);
-        });
-
-        const uploadResponse = await uploadImages(imageFormData);
-        uploadedImageUrls = uploadResponse;
-      }
-
       const postData = {
         boardTitle: title,
         boardContent: content,
         boardType: boardType,
         boardCategory: boardCategory,
-        imageUrls: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
       };
 
       await addPost(postData);
@@ -89,11 +71,6 @@ const CreatePost: React.FC = () => {
           required
         />
         <TextEditor defaultValue={content} onChange={handleContentChange} />
-        <input 
-          type="file" 
-          multiple 
-          onChange={handleImageChange} 
-        />
         <div className={styles.buttonGroup}>
           <button type="button" className={styles.backButton} onClick={() => navigate(`/Board/${boardType.toLowerCase()}`)}>작성 취소</button>
           <button type="submit" className={styles.submitButton}>작성 완료</button>

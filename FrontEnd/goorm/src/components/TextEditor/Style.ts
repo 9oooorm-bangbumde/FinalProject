@@ -10,7 +10,7 @@ export const EditorWrapper = styled.div`
   .ck.ck-editor__editable_inline {
     border-left: 1;
     border-right: 1;
-    height: 200px;
+    height: 300px;
     border-bottom: 1;
   }
 

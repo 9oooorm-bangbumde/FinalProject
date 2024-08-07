@@ -7,12 +7,18 @@ import Exercise from './pages/Exercise/Exercise';
 import Map from './pages/FindGym/Map/Map';
 import Login from './pages/Login/Login';
 import SignUp from './pages/SignUp/SignUp';
-import FreeBoardPage from './pages/Board/FreeBoardPage';
-import ExerciseBoardPage from './pages/Board/page/ExerciseBoardPage';
-import DietBoardPage from './pages/Board/page/DietBoardPage';
+
+
+import FreeBoardPage from './pages/Board/page/FreeBoard/FreeBoardPage';
 import DetailPost from './pages/Board/Post/DetailPost';
 import UpdatePost from './pages/Board/Post/UpdatePost';
-import CreatePost from './pages/Board/Post/CreatePost'; 
+import CreatePost from './pages/Board/Post/CreatePost';
+import Food from './pages/Food/Food';
+import { AuthProvider } from './pages/Login/auth/AuthContext';
+import ProtectedRoute from './pages/Login/auth/ProtectedRoute';
+import Main from './pages/MyPage/Main/Main';
+import ExerciseRecordPage from './components/ExerciseRecords/ExerciseRecordList/ExerciseRecordPage';
+import ExerciseChartPage from './components/ExerciseRecords/ExerciseChart/ExerciseChartPage';
 
 const Layout: React.FC = () => (
   <>
@@ -26,25 +32,30 @@ const Layout: React.FC = () => (
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-
-        <Route element={<Layout />}>
-          <Route path="/" element={<h1>Welcome to MyWebsite</h1>} />
-          <Route path="/Chat" element={<Chat />} />
-          <Route path="/exercise" element={<Exercise />} />
-          <Route path="/findgym" element={<Map />} />
-          <Route path="/Board/free" element={<FreeBoardPage />} />
-          <Route path="/Board/exercise" element={<ExerciseBoardPage />} />
-          <Route path="/Board/diet" element={<DietBoardPage />} />
-          <Route path="/Board/free/post/:id" element={<DetailPost />} />
-          <Route path="/Board/free/post/edit/:id" element={<UpdatePost />} />
-          <Route path="/Board/free/createpost" element={<CreatePost />} /> 
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<h1>Welcome to MyWebsite</h1>} />
+            <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+            <Route path="/exercise" element={<ProtectedRoute><Exercise /></ProtectedRoute>} />
+            <Route path="/food" element={<Food />} />
+            <Route path="/findgym" element={<ProtectedRoute><Map /></ProtectedRoute>} />
+            <Route path="/main" element={<Main />} />
+            <Route path="/exercise/records/:month" element={<ExerciseRecordPage />} />
+            <Route path="/exercise/chart/:month" element={<ExerciseChartPage />} />
+            <Route path="/Board" element={<Outlet />}>
+              <Route path="free" element={<FreeBoardPage />} />
+              <Route path="free/post/:id" element={<DetailPost />} />
+              <Route path="free/post/edit/:id" element={<UpdatePost />} />
+              <Route path="free/createpost" element={<CreatePost />} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
 

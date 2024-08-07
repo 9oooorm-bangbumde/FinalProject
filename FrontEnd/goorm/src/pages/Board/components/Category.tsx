@@ -18,7 +18,6 @@ const Category: React.FC<CategoryProps> = ({ boardType, boardCategory, handleBoa
       <select value={boardCategory} onChange={handleBoardCategoryChange}>
         {/* <option value="NONE">카테고리 없음</option> */}
         <option value="WORKOUT">운동</option>
-        <option value="FOOD">맛집</option>
         <option value="AD">광고</option>
         <option value="CONCERN">상담</option>
         <option value="HOBBY">취미</option>

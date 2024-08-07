@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { BoardProps } from './types';
-import { toggleLike as apiToggleLike } from './api/boardAPI';
+import { BoardProps } from '../../types';
+// import { toggleLike as apiToggleLike } from './api/boardAPI';
 
 const Table = styled.table`
   width: 100%;
@@ -16,7 +16,7 @@ const Table = styled.table`
 const TableHeader = styled.th`
   border-top: 1px solid #000;
   padding: 18px;
-  background-color: #f2f2f2;
+  background-color: #DEECF0;
   color: #000;
 `;
 
@@ -26,7 +26,7 @@ const TableRow = styled.tr`
   }
 
   &:hover {
-    background-color: #f1f1f1;
+    background-color: #E7F0F1;
   }
 `;
 
@@ -52,7 +52,6 @@ const formatDate = (dateString: string): string => {
 
 const categoryMap: { [key: string]: string } = {
   WORKOUT: '운동',
-  FOOD: '맛집',
   AD: '광고',
   CONCERN: '상담',
   HOBBY: '취미',
@@ -63,18 +62,6 @@ const categoryMap: { [key: string]: string } = {
 const BoardList: React.FC<BoardProps> = ({ posts, setPosts }) => {
   const navigate = useNavigate();
 
-  const handleLikeToggle = async (boardId: number) => {
-    try {
-      const response = await apiToggleLike(boardId);
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.boardId === boardId ? { ...post, likes: !post.likes, likesCnt: response.likesCnt } : post
-        )
-      );
-    } catch (error) {
-      console.error('좋아요 토글 중 오류가 발생했습니다', error);
-    }
-  };
 
   return (
     <div>
@@ -97,15 +84,6 @@ const BoardList: React.FC<BoardProps> = ({ posts, setPosts }) => {
               <TitleCell onClick={() => navigate(`/Board/free/post/${post.boardId}`)}>{post.boardTitle}</TitleCell>
               <TableCell>{post.writer}</TableCell>
               <TableCell>{formatDate(post.boardRegDate)}</TableCell>
-              {/* <TableCell> */}
-                {/* <LikeButton
-                  boardId={post.boardId}
-                  isLiked={post.likes}
-                  likesCnt={post.likesCnt}
-                  toggleLike={handleLikeToggle}
-                  reportsCnt={post.reportsCnt}
-                /> */}
-              {/* </TableCell> */}
             </TableRow>
           ))}
         </tbody>

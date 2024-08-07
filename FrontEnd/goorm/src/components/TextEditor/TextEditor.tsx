@@ -1,7 +1,7 @@
 import axiosInstance from '../../api/axiosInstance';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { EditorWrapper } from './Style';
 
 class UploadAdapter {
@@ -41,44 +41,51 @@ interface Props {
   toolbar?: string[];
 }
 
-class TextEditor extends React.Component<Props> {
-  render() {
-    function MyCustomUploadAdapterPlugin(editor: any) {
-      editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
-        return new UploadAdapter(loader);
-      };
-    }
-
-    const editorConfig = {
-      extraPlugins: [MyCustomUploadAdapterPlugin],
-      toolbar: this.props.toolbar || [
-        'undo', 'redo', '|',
-        'imageUpload', 'imageStyle:full', 'imageStyle:side', '|',
-        'heading', '|',
-        'bold', 'italic', 'link', '|',
-        'bulletedList', 'numberedList', 'insertTable',
-      ],
-      image: {
-        toolbar: [
-          'imageTextAlternative', 'imageStyle:full', 'imageStyle:side',
-        ],
-      },
+const TextEditor  = ({toolbar, defaultValue, onChange}: Props)=> {
+  function MyCustomUploadAdapterPlugin(editor: any) {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
+      return new UploadAdapter(loader);
     };
-
-    return (
-      <EditorWrapper>
-        <CKEditor
-          editor={ClassicEditor}
-          data={this.props.defaultValue}
-          config={editorConfig}
-          onChange={(event, editor) => {
-            const data = editor.getData();
-            this.props.onChange(data);
-          }}
-        />
-      </EditorWrapper>
-    );
   }
+
+  const editorConfig: ComponentProps<typeof CKEditor>['config'] = {
+    extraPlugins: [MyCustomUploadAdapterPlugin],
+    toolbar: toolbar || [
+      'undo', 'redo', '|',
+      'imageUpload', 'imageStyle:full', 'imageStyle:side', '|',
+      'heading', '|',
+      'bold', 'italic', 'link', '|',
+      'bulletedList', 'numberedList', 'insertTable',
+    ],
+    image: {
+      styles:  {
+        options: [
+          {
+              name: 'default',
+              title: 'Default',
+              icon: 'default',
+              className: 'default-image-size',
+              modelElements: ['imageBlock']
+          }
+        ]
+      },
+      toolbar: ['imageTextAlternative']
+    },
+  };
+
+  return (
+    <EditorWrapper>
+     <CKEditor
+        editor={ClassicEditor}
+        data={defaultValue}
+        config={editorConfig}
+        onChange={(event, editor) => {
+          const data = editor.getData();
+          onChange(data);
+        }}
+      />
+    </EditorWrapper>
+  );
 }
 
 export default TextEditor;

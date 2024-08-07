@@ -1,33 +1,71 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import { ExerciseStore } from "../../store/store";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import axiosInstance from "../../api/axiosInstance";
+import { useExercise } from "../../contexts/exerciseContext";
 
-interface ExerciseMemoProps {
-  onFileUpload: (file: File) => void;
-}
+const ExerciseMemo: React.FC = () => {
+  const { state: {
+    exerciseDetails, exerciseRecords
+  }, addMemo } = useExercise();
+  const [editorData, setEditorData] = useState<string>("");
 
-const ExerciseMemo: React.FC<ExerciseMemoProps> = ({onFileUpload}) => {
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-  const setImageFile = ExerciseStore(state => state.setImageFile);
+  const { state: { isDeleteModalOpen, isEditModalOpen } } = useExercise();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if(event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      setImageFile(file);
-      setImagePreviewUrl(URL.createObjectURL(file));
-      onFileUpload(file);
-    }
-  }
+  const recordId = exerciseRecords.length > 0 ? exerciseRecords[exerciseRecords.length - 1].recordId + 1 : 1; 
+
+  const currentRecord = Object.values(exerciseDetails).find(record => record.recordId === recordId - 1);
+  const currentMemo = currentRecord ? currentRecord.memo : "여기에 운동메모를 기록하세요.";
 
   return (
     <MemoContainer>
-      <ImageContainer>
-        <ImageInput type="file" accept="image/*" onChange={handleFileChange}/>
-        {imagePreviewUrl && <ImagePreview src={imagePreviewUrl} alt="미리보기 이미지" />}
-      </ImageContainer>
       <MemoDetails>
         <DetailsText>메모</DetailsText>
-        <MemoDetailsInput className="memo-input" type="text" placeholder='운동 관련 메모 기록하기'></MemoDetailsInput>
+        {!isDeleteModalOpen && !isEditModalOpen && (  // 메모 모달이 열려 있지 않을 때만 CKEditor 표시
+          <CKEditor 
+            editor={ClassicEditor} 
+            data="<p>여기에 운동메모를 입력하세요</p>"
+            onChange={(event, editor) => {
+              const data = editor.getData();
+              setEditorData(data);
+            }}
+            onBlur={(event, editor) => {
+              const data = editor.getData();
+              addMemo(recordId, data.toString());
+              console.log("recordId and data: " + recordId + data);
+            }} 
+            config={{
+              toolbar: [
+                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'
+              ]
+            }}
+          />
+        )}
+        <CKEditor 
+            editor={ClassicEditor} 
+            data=""
+            onChange={(event, editor) => {
+              const data = editor.getData();
+              setEditorData(data);
+            }}
+            onBlur={(event, editor) => {
+              const data = editor.getData();
+              addMemo(recordId, data.toString());
+              console.log("recordId and data: " + recordId + data);
+            }} 
+            config={{
+              toolbar: [
+                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'imageUpload'
+              ],
+              ckfinder: {
+                uploadUrl: `${axiosInstance.defaults.baseURL}/s3/ck/upload`, // 이미지 업로드를 위한 서버 엔드포인트
+              },
+              image: {
+                toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side']
+              }
+            }}
+          />
       </MemoDetails>
     </MemoContainer>
   )
@@ -37,39 +75,34 @@ export default ExerciseMemo
 
 const MemoContainer = styled.div`
   display: flex;
-  margin-top: 20px;
-  width: 100%;
-  height: 12.5rem;
-  margin-left: 410px;
-`;
-
-const ImageContainer = styled.div`
-  display: flex;
-  width: 30%;
-  height: 100%;
-  border: 1.5px solid black;
-  border-radius: 0.3125rem;
-`;
-
-const ImageInput = styled.input`
   margin-top: 0.625rem;
-  margin-left: 0.625rem;
-`;
-
-const ImagePreview = styled.img`
-  margin-top: 10px;
-  margin-bottom: 0.625rem;
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 0.625rem;
+  width: 76%;
+  height: 470px;
+  margin-left: 23.75rem;
+  flex-direction: column;
+  margin-bottom: 20px;
 `;
 
 const MemoDetails = styled.div`
   display: flex;
-  width: 43%;
-  margin-left: 1.25rem;
-  margin-right: 1.875rem;
+  width: 100%;
+  margin-bottom: 10px;
   border: 1px solid black;
+  border-right: none;
+  height: 100%;
+
+  .ck-editor {
+    z-index: 1; /* 다른 UI 요소보다 낮게 설정 */
+  }
+
+  .ck.ck-editor__main > .ck-editor__editable {
+    width: 68.75rem;
+    height: 430px;
+    max-height: 430px;
+    overflow-y: auto;
+    border: 1px solid black;
+    font-size: 0.875rem;
+  }
 `;
 
 const DetailsText = styled.p `
@@ -78,13 +111,4 @@ const DetailsText = styled.p `
   margin-right: 1.25rem;
   font-size: 0.875rem;
   font-weight: bold;
-`;
-
-const MemoDetailsInput = styled.input`
-  width: 100%;
-  font-size: 0.875rem;
-  border-top: none;
-  border-right: none;
-  border-bottom: none;
-  border-left: 1px solid black;
 `;

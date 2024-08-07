@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import BoardList from './BoardList';
-import Pagination from './components/Pagination';
-import Searchbar from './components/SearchBar';
-import { BoardDetails } from './types';
-import { fetchPosts } from './api/boardAPI';
-import Tabs from './components/Tabs';
+import Pagination from '../../components/Pagination';
+import Searchbar from '../../components/SearchBar';
+import { BoardDetails } from '../../types';
+import { fetchPosts } from '../../api/boardAPI';
+import Boardtabs from '../../../../components/Taps/BoardTap/BoardTabs';
 
 const Container = styled.div`
   padding: 0 20px;
@@ -59,7 +59,7 @@ const FreeBoardPage: React.FC = () => {
 
   return (
     <Container>
-      <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+      <Boardtabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
       <BoardList
         boardType={selectedTab}
         currentPage={currentPage}

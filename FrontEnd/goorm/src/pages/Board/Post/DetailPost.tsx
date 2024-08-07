@@ -4,7 +4,7 @@ import { BoardDetails } from '../types';
 import { fetchPostDetail, deletePost, toggleLike as apiToggleLike } from '../api/boardAPI';
 import styles from './DetailPost.module.scss';
 import CommentSection from '../Comment/CommentSection';
-import Tabs from '../components/Tabs';
+import Tabs from '../../../components/Taps/BoardTap/BoardTabs';
 import { ReportModal, DeleteModal, DeleteCommentModal } from '../components/Modal';
 import LikeButton from '../components/LikeButton';
 
@@ -147,13 +147,13 @@ const DetailPost: React.FC = () => {
         </div>
         <div className={styles.PostContent}>
           <div dangerouslySetInnerHTML={{ __html: post.boardContent }} />
-          {post.imageUrls && post.imageUrls.length > 0 && (
+          {/* {post.imageUrls && post.imageUrls.length > 0 && (
             <div className={styles.ImageContainer}>
               {post.imageUrls.map((url, index) => (
-                <img key={index} src={url} alt={`post_image_${index}`} className={styles.PostImage} />
-              ))}
-            </div>
-          )}
+                <img key={index} src={url} alt={`post_image_${index}`} className={styles.PostImage} /> */}
+              {/* ))} */}
+            {/* </div> */}
+          {/* )} */}
         </div>
         <CommentSection postId={post.boardId} setShowDeleteCommentModal={setShowDeleteCommentModal} setModalMessage={setModalMessage} setModalAction={setModalAction} />
         <div className={styles.ButtonContainer}>

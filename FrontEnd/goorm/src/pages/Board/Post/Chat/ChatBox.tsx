@@ -25,16 +25,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ x, y, author, onClose }) => {
   }, [onClose]);
 
   const handleChatRequest = () => {
-    // 서버로 요청을 보내는 로직 추가
     console.log(`채팅 신청을 보냅니다: ${author}`);
-    // 여기에 서버 요청 코드를 추가하세요.
     onClose();
   };
 
   const handleFriendRequest = () => {
-    // 친구 추가 요청을 보내는 로직 추가
     console.log(`친구 추가를 보냅니다: ${author}`);
-    // 여기에 서버 요청 코드를 추가하세요.
     onClose();
   };
 

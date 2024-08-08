@@ -4,6 +4,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 import styles from './CommentSection.module.scss';
 import { fetchComments, addComment, deleteComment, updateComment } from '../api/boardAPI';
 import { Comment } from '../types';
+import ChatBox from './Chat/ChatBox'; //ChatBox 컴포넌트 임포트
 
 
 interface CommentSectionProps {
@@ -18,6 +19,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
   const [editCommentContent, setEditCommentContent] = useState<string>('');
   const editInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const [showChatBox, setShowChatBox] = useState<boolean>(false); //ChatBox 표시 상태
+  const [chatBoxPosition, setChatBoxPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 }); //ChatBox 위치 상태
+  const [selectedAuthor, setSelectedAuthor] = useState<string>(''); //선택된 작성자 이름 상태
+
 
   const loadComments = async () => {
     try {
@@ -116,6 +122,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     setEditCommentContent('');
   };
 
+  //채팅신청 메뉴 열기 함수
+  const handleAuthorClick = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, comment: Comment) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setChatBoxPosition({ x: rect.left, y: rect.bottom }); //클릭한 위치로 ChatBox 위치 설정
+    setSelectedAuthor(comment.writer); // 선택된 작성자 설정
+    setShowChatBox(true); //ChatBox 표시
+  };
+
+  //채팅신청 메뉴 닫기 함수
+  const closeChatBox = () => {
+    setShowChatBox(false); //ChatBox 닫기
+  };
+
   return (
     <div className={styles.commentSection}>
       <ul className={styles.commentList}>
@@ -126,7 +145,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
               <div className={styles.userIcon}>
                 <FontAwesomeIcon icon={faUser} />
               </div>
-              <span className={styles.commentAuthor}>{comment.writer}</span>
+              <span 
+                className={styles.commentAuthor}
+                onClick={(e) => handleAuthorClick(e, comment)}
+              >
+                {comment.writer}</span>
               {editCommentId === comment.commentId ? (
                 <form onSubmit={handleCommentUpdateSubmit} className={styles.editForm}>
                   <textarea
@@ -197,6 +220,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
           </div>
         </div>
       )}
+      {showChatBox && ( //ChatBox 표시 조건
+        <ChatBox
+          x={chatBoxPosition.x}
+          y={chatBoxPosition.y}
+          author={selectedAuthor} //선택된 작성자 이름 전달
+          onClose={closeChatBox} //ChatBox 닫기 핸들러
+        />
+      )}
+
     </div>
   );
 };
